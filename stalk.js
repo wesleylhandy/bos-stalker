@@ -1,11 +1,11 @@
 const twitterKeys = {
-    consumer_key: process.env.consumer_key,
-    consumer_secret: process.env.consumer_key,
-    access_token_key: process.env.access_token_key,
-    access_token_secret: process.env.access_token_secret
+    consumer_key: process.env.CONSUMER_KEY,
+    consumer_secret: process.env.CONSUMER_SECRET,
+    access_token_key: process.env.ACCESS_TOKEN_KEY,
+    access_token_secret: process.env.ACCESS_TOKEN_SECRET
 }
 
-const twilioClient = require('twilio')(process.env.accountSid, process.env.authToken);
+const twilioClient = require('twilio')(process.env.ACCOUNTSID, process.env.AUTHTOKEN);
 const twitterClient = require('twitter')(twitterKeys);
 
 const fs = require('fs');
@@ -16,8 +16,8 @@ let delay; //initialize delay for api call
 function sendSMS(tweet) {
     return new Promise((resolve, reject)=>{
         twilioClient.messages.create({
-            to: process.env.personalNumber,
-            from: process.env.twilioNumber,
+            to: process.env.PERSONALNUMBER,
+            from: process.env.TWILIONUMBER,
             body: `Wes Bos just tweeted about stickers: ${tweet}`
         }, (err, msg)=> {
             if(err) {
@@ -33,7 +33,7 @@ function sendSMS(tweet) {
 function getLastTweetId() {
 
     function readLoggedTweets() {
-        let arr = fs.readFileSync('tweets.json', 'utf-8');
+        let arr = fs.readFileSync('tweetLog.json', 'utf-8');
         if (!arr) {
             return [];
         } else {
@@ -55,7 +55,7 @@ function stalkerEngine() {
             if(tweets.statuses.length) {
                 sendSMS(tweets.statuses[0].text).then(success=>{
                     const writableTweets = JSON.stringify(tweets.statuses, null, 5);
-                    fs.writeFileSync('tweets.json', writableTweets, 'utf-8');
+                    fs.writeFileSync('tweetLog.json', writableTweets, 'utf-8');
                 }).catch(err=>{
                     console.error(err);
                 });
