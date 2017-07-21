@@ -1,0 +1,24 @@
+{
+  "name": "bos-stalker",
+  "version": "1.0.0",
+  "description": "Calls twitter Restful API at set intervals to check for new tweets by Wes Bos with that mention stickers, then uses the Twilio API to text me that he just posted.",
+  "main": "stalk.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wesleylhandy/bos-stalker.git"
+  },
+  "author": "Wesley L. Handy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wesleylhandy/bos-stalker/issues"
+  },
+  "homepage": "https://github.com/wesleylhandy/bos-stalker#readme",
+  "dependencies": {
+    "moment": "^2.18.1",
+    "twilio": "^3.5.0",
+    "twitter": "^1.7.1"
+  }
+}
