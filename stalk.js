@@ -1,5 +1,3 @@
-const twilioClient = require('twilio')(process.env.accountSid, process.env.authToken);
-
 const twitterKeys = {
     consumer_key: process.env.consumer_key,
     consumer_secret: process.env.consumer_key,
@@ -7,6 +5,7 @@ const twitterKeys = {
     access_token_secret: process.env.access_token_secret
 }
 
+const twilioClient = require('twilio')(process.env.accountSid, process.env.authToken);
 const twitterClient = require('twitter')(twitterKeys);
 
 const fs = require('fs');
@@ -52,13 +51,15 @@ function stalkerEngine() {
     const lastTweetId = getLastTweetId();
 
     twitterClient.get('search/tweets', {q: 'from:wesbos -filter:retweets stickers', since_id: lastTweetId}, (err, tweets, response)=>{
-        if (tweets.statuses.length) {
-            sendSMS(tweets.statuses[0].text).then(success=>{
-                const writableTweets = JSON.stringify(tweets.statuses, null, 5);
-                fs.writeFileSync('tweets.json', writableTweets, 'utf-8');
-            }).catch(err=>{
-                console.error(err);
-            });
+        if (tweets.statuses) {
+            if(tweets.statuses.length) {
+                sendSMS(tweets.statuses[0].text).then(success=>{
+                    const writableTweets = JSON.stringify(tweets.statuses, null, 5);
+                    fs.writeFileSync('tweets.json', writableTweets, 'utf-8');
+                }).catch(err=>{
+                    console.error(err);
+                });
+            }
         }
     });
 }
@@ -66,5 +67,5 @@ function stalkerEngine() {
 //initial call to start stalker
 stalkerEngine();
 
-//call stalker once per hour afterwards
+//call stalker once per minute afterwards
 delay = setInterval(stalkerEngine, 3600000);
