@@ -1,4 +1,4 @@
-# Stalking @wesbos on Twitter for Stickers
+# :squirrel: Stalking @wesbos on Twitter for Stickers
 
 If you are like me, you love Wes Bos - he is Boss :exclamation: His courses have been helpful because he has makes things fun and interesting. This also means you are one of 110,000 other people in the world who have tried to [order stickers](http://bos.af) from him only to find, well, they are already sold out! :poop:
 
