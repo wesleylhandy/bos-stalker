@@ -1,1 +1,1 @@
-worker: node stalker.js
+worker: node stalk.js
