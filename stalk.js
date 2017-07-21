@@ -67,5 +67,5 @@ function stalkerEngine() {
 //initial call to start stalker
 stalkerEngine();
 
-//call stalker once per hour afterwards
-delay = setInterval(stalkerEngine, 3600000);
+//call stalker once every 5 minutes afterwards
+delay = setInterval(stalkerEngine, 180000);
