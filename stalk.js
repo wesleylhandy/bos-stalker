@@ -1,8 +1,12 @@
-const keys = require('./config.js');
-const twilioKeys = keys.twilioKeys;
-const twitterKeys = keys.twitterKeys;
+const twilioClient = require('twilio')(process.env.accountSid, process.env.authToken);
 
-const twilioClient = require('twilio')(twilioKeys.accountSid, twilioKeys.authToken);
+const twitterKeys = {
+    consumer_key: process.env.consumer_key,
+    consumer_secret: process.env.consumer_key,
+    access_token_key: process.env.access_token_key,
+    access_token_secret: process.env.access_token_secret
+}
+
 const twitterClient = require('twitter')(twitterKeys);
 
 const fs = require('fs');
@@ -13,8 +17,8 @@ let delay; //initialize delay for api call
 function sendSMS(tweet) {
     return new Promise((resolve, reject)=>{
         twilioClient.messages.create({
-            to: twilioKeys.personalNumber,
-            from: twilioKeys.twilioNumber,
+            to: process.env.personalNumber,
+            from: process.env.twilioNumber,
             body: `Wes Bos just tweeted about stickers: ${tweet}`
         }, (err, msg)=> {
             if(err) {
