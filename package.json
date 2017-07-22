@@ -18,6 +18,7 @@
   "homepage": "https://github.com/wesleylhandy/bos-stalker#readme",
   "dependencies": {
     "moment": "^2.18.1",
+    "mongodb": "^2.2.30",
     "twilio": "^3.5.0",
     "twitter": "^1.7.1"
   }

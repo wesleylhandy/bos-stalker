@@ -7,9 +7,12 @@ const twitterKeys = {
 
 const twilioClient = require('twilio')(process.env.ACCOUNTSID, process.env.AUTHTOKEN);
 const twitterClient = require('twitter')(twitterKeys);
+const MongoClient = require('mongodb').MongoClient
 
-const fs = require('fs');
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bos';
+
 const moment = require('moment');
+const assert = require('assert');
 
 let delay; //initialize delay for api call
 
@@ -30,42 +33,42 @@ function sendSMS(tweet) {
     })
 }
 
-function getLastTweetId() {
+function getLastTweetId(collection, callback) {
 
-    function readLoggedTweets() {
-        let arr = fs.readFileSync('tweetLog.json', 'utf-8');
-        if (!arr) {
-            return [];
-        } else {
-            return JSON.parse(arr);
-        }
-    }
-    const tweets = readLoggedTweets();
-
-    if (tweets.length) return tweets[0].id_str;
-    else return 0;    
+    collection.findOne({},{sort: {id_str: -1}, limit: 1}).then(tweet=> callback(tweet.id_str)).catch(err=>callback(0));
+   
 }
 
-function stalkerEngine() {
+function stalkerEngine(collection) {
 
-    const lastTweetId = getLastTweetId();
+    getLastTweetId(collection, lastTweetId => {
 
-    twitterClient.get('search/tweets', {q: 'from:wesbos -filter:retweets stickers', since_id: lastTweetId}, (err, tweets, response)=>{
-        if (tweets.statuses) {
-            if(tweets.statuses.length) {
-                sendSMS(tweets.statuses[0].text).then(success=>{
-                    const writableTweets = JSON.stringify(tweets.statuses, null, 5);
-                    fs.writeFileSync('tweetLog.json', writableTweets, 'utf-8');
-                }).catch(err=>{
-                    console.error(err);
-                });
+        twitterClient.get('search/tweets', {q: 'from:wesbos -filter:retweets stickers', since_id: lastTweetId}, (err, tweets, response)=>{
+            if (tweets.statuses) {
+                if(tweets.statuses.length) {
+                    sendSMS(tweets.statuses[0].text).then(success=>{
+                        collection.insertMany(tweets.statuses).then(done=>{}).catch(err=>{if(err) console.error(err)});
+                    }).catch(err=>{
+                        console.error(err);
+                    });
+                }
             }
-        }
+        });
     });
 }
 
-//initial call to start stalker
-stalkerEngine();
+MongoClient.connect(uri, function(err, db) {
+    "use strict";
 
-//call stalker once every 5 minutes afterwards
-delay = setInterval(stalkerEngine, 18000);
+    assert.equal(null, err);
+    console.log("Successfully connected to MongoDB.");
+
+    //get collection 'tweets' or create one
+    const collection = db.collection('tweets');
+   
+    //initial call to start stalker
+    stalkerEngine(collection);
+
+    //call stalker once every 5 minutes afterwards
+    delay = setInterval(function(){stalkerEngine(collection)}, 180000);
+});
