@@ -17,3 +17,9 @@ I have set up calls to the twitter REST API once per hour looking for new tweets
 2. Get a twilio dev account by going to https://www.twilio.com/, get your Account SID and Auth Token, which you will also save in `config.js` and later as environment variables, then purchase your first phone number, which only runs $1/month and charges you only a penny to send a message.
 3. Fork and clone this repo, then run `npm install` or `yarn` if you use yarn.
 4. Use your favorite host to deploy. Currently, the `package.json` and `Procfile` are set up for a worker to run on Heroku.
+
+#### Update Regarding Heroku Deployment && Data Persistence.
+
+On a local machine, using the built-in `fs` node-module is an easy way to manage data persistence. However, when deploying to heroku, I found that this system would not work.
+
+Therefore I refactored my code for data persistence with MongoDB, and utilized the `mLab MongoDB :: Mongodb` add-on.
