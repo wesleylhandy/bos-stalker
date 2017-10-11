@@ -4,3 +4,4 @@ config.js
 testing.js
 yarn.lock
 package-lock.json
+.env
