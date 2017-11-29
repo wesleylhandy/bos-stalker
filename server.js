@@ -17,7 +17,8 @@ const assert = require('assert');
 
 //initialize MongoDB client
 const MongoClient = require('mongodb').MongoClient
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bos';
+const uri = process.env.MLAB_URI || 'mongodb://localhost:27017/bos';
+
 let delay; //initialize delay for app engine
 MongoClient.connect(uri, function(err, db) {
     "use strict";
@@ -47,7 +48,10 @@ function appEngine(collection) {
 
             //call the Twitter API - for all tweets from @wesbos, filter out retweets, and only tweets that mention the word 'stickers'
             twitterClient.get('search/tweets', { q: 'from:wesbos -filter:retweets stickers', since_id: lastTweetId }, (err, tweets, response) => {
-
+                //log any twitter errors
+                if (err) {
+                    return console.error({ twitterError: err });
+                }
                 //make sure we got a response with list of tweets - if no list of tweets, then no mention of stickers
                 if (tweets.statuses && tweets.statuses.length) {
 
@@ -62,11 +66,16 @@ function appEngine(collection) {
                             console.log(`SMS with id: ${msg.sid} sent at timestamp: ${moment.now()}`);
 
                             //insert all the new tweets into the db
-                            collection.insertMany(tweets.statuses).then(done => {}).catch(err => { if (err) console.error(err) });
+                            collection.insertMany(tweets.statuses)
+                                .then(done => {})
+                                .catch(err => {
+                                    if (err) console.error({ mongoInsertError: err })
+                                });
                         })
-                        .catch(err => console.error(err));
+                        .catch(err => console.error({ twilioError: err }));
 
                 }
             });
-        });
+        })
+        .catch(err => console.error({ MongoFindError: err }));
 }
